@@ -1,26 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-
-const formSchema = z.object({
-  firstName: z.string().min(2, 'First name is required'),
-  lastName: z.string().min(2, 'Last name is required'),
-  email: z.string().email('Invalid email address'),
-  address: z.string().min(5, 'Address is required'),
-  city: z.string().min(2, 'City is required'),
-  country: z.string().min(2, 'Country is required'),
-  postalCode: z.string().min(5, 'Postal code is required'),
-  paymentMethod: z.enum(['credit', 'paypal']),
-})
 
 const cartItems = [
   { id: 1, name: 'Radiant Foundation', price: 39.99, quantity: 1 },
@@ -28,189 +13,93 @@ const cartItems = [
 ]
 
 export default function CheckoutPage() {
-  const [isProcessing, setIsProcessing] = useState(false)
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      address: '',
-      city: '',
-      country: '',
-      postalCode: '',
-      paymentMethod: 'credit',
-    },
-  })
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsProcessing(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    console.log(values)
-    setIsProcessing(false)
-    alert('Order placed successfully!')
-  }
+  const [paymentMethod, setPaymentMethod] = useState('credit-card')
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Here you would typically process the payment and create the order
+    alert('Thank you for your order!')
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-primary">Checkout</h1>
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div>
           <Card>
             <CardHeader>
               <CardTitle>Shipping Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div>
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input id="firstName" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input id="lastName" required />
+                    </div>
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="email" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="address"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Address</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Input id="address" required />
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="postalCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Postal Code</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div>
+                      <Label htmlFor="city">City</Label>
+                      <Input id="city" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="postalCode">Postal Code</Label>
+                      <Input id="postalCode" required />
+                    </div>
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Country</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a country" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="us">United States</SelectItem>
-                            <SelectItem value="ca">Canada</SelectItem>
-                            <SelectItem value="uk">United Kingdom</SelectItem>
-                            <SelectItem value="au">Australia</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Payment Method</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="credit" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Credit Card
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="paypal" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                PayPal
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full" disabled={isProcessing}>
-                    {isProcessing ? 'Processing...' : 'Place Order'}
-                  </Button>
-                </form>
-              </Form>
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Input id="country" required />
+                  </div>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Payment Method</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="credit-card" id="credit-card" />
+                  <Label htmlFor="credit-card">Credit Card</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="paypal" id="paypal" />
+                  <Label htmlFor="paypal">PayPal</Label>
+                </div>
+              </RadioGroup>
+              {paymentMethod === 'credit-card' && (
+                <div className="mt-4 grid gap-4">
+                  <div>
+                    <Label htmlFor="cardNumber">Card Number</Label>
+                    <Input id="cardNumber" required />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="expirationDate">Expiration Date</Label>
+                      <Input id="expirationDate" placeholder="MM/YY" required />
+                    </div>
+                    <div>
+                      <Label htmlFor="cvv">CVV</Label>
+                      <Input id="cvv" required />
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -233,9 +122,13 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </CardContent>
+            <CardFooter>
+              <Button className="w-full" onClick={handleSubmit}>Place Order</Button>
+            </CardFooter>
           </Card>
         </div>
       </div>
     </div>
   )
 }
+
